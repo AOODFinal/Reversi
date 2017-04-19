@@ -22,6 +22,7 @@ public class MainScreen extends JFrame {
 		new MainScreen();
 	}
 	public MainScreen() {
+		super("Reversi/Othello");
 		comp = new GeneralAI();
 		Object[] colors = {"Black" , "White"};
 		int answer = JOptionPane.showOptionDialog(this, "Would you like to play as black or white?",
@@ -55,6 +56,7 @@ public class MainScreen extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		pack();
 		setVisible(true);
+		setResizable(false);
 		do {
 			//TODO turncycle
 		} while (!gameOver());
