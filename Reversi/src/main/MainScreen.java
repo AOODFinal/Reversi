@@ -3,6 +3,7 @@ package main;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -59,7 +60,18 @@ public class MainScreen extends JFrame {
 		setResizable(false);
 		do {
 			//TODO turncycle
+			checkForGhosts();
 		} while (!gameOver());
+	}
+	
+	/**
+	 * Check to place ghosts (where the player is allowed to place tiles)
+	 */
+	private static ArrayList<Point> ghosts;
+	private static void checkForGhosts() {
+		if (ghosts==null)
+			ghosts = new ArrayList<>();
+		//TODO Check for and place ghosty points in ghosts
 	}
 	private static boolean gameOver() {
 		// TODO
@@ -86,6 +98,16 @@ public class MainScreen extends JFrame {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
 		} 
+	}
+	private static class Point {
+		int x,y;
+		public Point(int x, int y) {
+			this.x=x;
+			this.y=y;
+		}
+		public Point() {
+			x=0;y=0;
+		}
 	}
 	private static class PieceLabel extends JLabel {
 		private static final long serialVersionUID = 5423659178406010534L;
