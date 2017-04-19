@@ -75,13 +75,15 @@ public class MainScreen extends JFrame {
 			if (visualBoard[x][y]==null) {
 				visualBoard[x][y] = new PieceLabel(x,y,piece);
 			} else {
+				if (board[x][y].getState() != Piece.BLANK)
+					return false;
 				visualBoard[x][y].setPiece(piece);
 			}
 			board[x][y] = new Piece(piece);
 			return true;
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
-		}
+		} 
 	}
 	private static class PieceLabel extends JLabel {
 		private static final long serialVersionUID = 5423659178406010534L;
@@ -93,8 +95,6 @@ public class MainScreen extends JFrame {
 			this.y=y;
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
-					//TODO
-					System.out.println(x + " , " + y);
 					updateBoard(x,y,player);
 				}
 			});
