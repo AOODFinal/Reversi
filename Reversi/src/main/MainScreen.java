@@ -72,7 +72,87 @@ public class MainScreen extends JFrame {
 		if (ghosts==null)
 			ghosts = new ArrayList<>();
 		//TODO Check for and place ghosty points in ghosts
+		ArrayList<Point> playerPieces = new ArrayList<>();
+		for (int x=0;x<board[0].length;x++) {
+			for (int y=0;y<board.length;y++) {
+				if (board[x][y].getState() == player) {
+					playerPieces.add(new Point(x,y));
+				}
+			}
+		}
+		//playerPieces has all of the player's pieces
+		for (Point p : playerPieces) {
+			for (int i=0;i<=8;i++) {
+				try {
+					ghosts.add(checkInLine(p,i));
+				} catch (NoSuchPointException e) {}
+			}
+		}
 	}
+	/**
+	 * Checks for an empty space at the end of a line 
+	 * @param player
+	 * @param start
+	 * @param direction
+	 * @return
+	 */
+	private static Point checkInLine(Point start, int direction) throws NoSuchPointException {
+		int dx=0; //change in x
+		int dy=0; //change in y
+		/*
+		 * set dx, dy based on direction
+		 * 812
+		 * 7 3
+		 * 654
+		 */
+		switch (direction) {
+		case 1:
+		case 5:dx=0;break;
+		case 2:
+		case 3:
+		case 4:dx=1;break;
+		case 6:
+		case 7:
+		case 8:dx=-1;break;
+			default:
+		}
+		switch (direction) {
+		case 8:
+		case 1:
+		case 2:dy=1;break;
+		case 3:
+		case 7:dy=0;break;
+		case 4:
+		case 5:
+		case 6:dy=-1;break;
+			default:
+		}
+		//determine if you can go
+		try {
+			if (board[start.x+dx][start.y+dy].getState() != -player) { //if the adjacent piece 
+				throw new NoSuchPointException();
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new NoSuchPointException();
+		}
+		//go all the way in the direction of dx,dy
+		Point current = start.clone();
+		try {
+			while (board[current.x+dx][current.y+dy].getState() == -player) {
+				current.x += dx;
+				current.y += dy;
+			}
+			if (board[current.x][current.y].getState() != Piece.BLANK) //Ends on a piece of same color
+				throw new NoSuchPointException();
+			return current;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new NoSuchPointException();
+		}
+	}
+	/**
+	 * Determines if the game is over
+	 * @return true if the game is over, false otherwise
+	 */
 	private static boolean gameOver() {
 		// TODO
 		return false;
@@ -107,6 +187,9 @@ public class MainScreen extends JFrame {
 		}
 		public Point() {
 			x=0;y=0;
+		}
+		public Point clone() {
+			return new Point(x,y);
 		}
 	}
 	private static class PieceLabel extends JLabel {
