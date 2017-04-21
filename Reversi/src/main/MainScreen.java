@@ -1,6 +1,8 @@
 package main;
 
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -59,9 +61,16 @@ public class MainScreen extends JFrame {
 		setVisible(true);
 		setResizable(false);
 		checkForGhosts(player);
-		for (Point ghost : ghosts) {
-			visualBoard[ghost.x][ghost.y].setPiece((player+1)/2 + Piece.BLACKGHOST);
-		}
+		displayGhosts(player);
+		addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_S) {
+					player = -player;
+					checkForGhosts(player);
+					displayGhosts(player);
+				}
+			}
+		});
 	}
 	
 	/**
@@ -74,7 +83,18 @@ public class MainScreen extends JFrame {
 			ghosts = new ArrayList<>();
 		if (compGhosts==null)
 			compGhosts = new ArrayList<>();
-		//TODO Check for and place ghosty points in ghosts
+		//remove current ghost points
+		if (toCheck == player) {
+			for (Point ghost : ghosts) {
+				if (visualBoard[ghost.x][ghost.y].getPiece() != player)
+					visualBoard[ghost.x][ghost.y].setPiece(Piece.BLANK);
+			}
+		}
+		if (toCheck == player) {
+			ghosts.clear();
+		} else {
+			compGhosts.clear();
+		}
 		ArrayList<Point> playerPieces = new ArrayList<>();
 		for (int x=0;x<board[0].length;x++) {
 			for (int y=0;y<board.length;y++) {
@@ -161,6 +181,20 @@ public class MainScreen extends JFrame {
 			throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Endpoint "+current+" is off grid");
 		}
 	}
+	public static void displayGhosts(int toShow) {
+		if (toShow == player) {
+			for (Point ghost : ghosts) {
+				visualBoard[ghost.x][ghost.y].setPiece((toShow+1)/2 + Piece.BLACKGHOST);
+			}
+		} else {
+			for (Point ghost : compGhosts) {
+				visualBoard[ghost.x][ghost.y].setPiece((toShow+1)/2 + Piece.BLACKGHOST);
+			}
+		}
+	}
+	public static void switchBetween(int x, int y, int switcher) {
+		
+	}
 	/**
 	 * Determines if the game is over
 	 * @return true if the game is over, false otherwise
@@ -224,6 +258,8 @@ public class MainScreen extends JFrame {
 				public void mouseReleased(MouseEvent e) {
 					updateBoard(x,y,player);
 					checkForGhosts(player);
+					displayGhosts(player);
+					switchBetween(x,y,player);
 				}
 			});
 		}
