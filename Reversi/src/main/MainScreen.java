@@ -45,11 +45,11 @@ public class MainScreen extends JFrame {
 		}
 		for (int i=0;i<visualBoard[0].length;i++) {
 			for (int j=0;j<visualBoard.length;j++) {
-				updateBoard(i,j,Piece.BLANK);
+				forceUpdateBoard(i,j,Piece.BLANK);
 				if (i==3 && j==3 || i==4 && j==4) {
-					updateBoard(i,j,Piece.WHITE);
+					forceUpdateBoard(i,j,Piece.WHITE);
 				} else if (i==4 && j == 3 || i==3 && j==4) {
-					updateBoard(i,j,Piece.BLACK);
+					forceUpdateBoard(i,j,Piece.BLACK);
 				}
 				add(visualBoard[i][j]);
 			}
@@ -58,10 +58,7 @@ public class MainScreen extends JFrame {
 		pack();
 		setVisible(true);
 		setResizable(false);
-		do {
-			//TODO turncycle
-			checkForGhosts();
-		} while (!gameOver());
+		checkForGhosts();
 	}
 	
 	/**
@@ -82,19 +79,28 @@ public class MainScreen extends JFrame {
 		}
 		//playerPieces has all of the player's pieces
 		for (Point p : playerPieces) {
-			for (int i=0;i<=8;i++) {
+			for (int i=1;i<=8;i++) {
 				try {
 					ghosts.add(checkInLine(p,i));
-				} catch (NoSuchPointException e) {}
+				} catch (NoSuchPointException e) {
+					//System.out.println(e.getMessage()); //Uncomment to display invalid points in console
+				}
 			}
+		}
+		for (Point ghost : ghosts) {
+			visualBoard[ghost.x][ghost.y].setPiece((player+1)/2 + Piece.BLACKGHOST);
 		}
 	}
 	/**
 	 * Checks for an empty space at the end of a line 
-	 * @param player
-	 * @param start
-	 * @param direction
-	 * @return
+	 * @param start the point at which the method starts
+	 * @param direction the direction the checker goes
+	 * </br>
+	 * 812</br>
+	 * 7 3</br>
+	 * 654</br>
+	 * @return the point the player can play at
+	 * @throws NoSuchPointException if no such point exists
 	 */
 	private static Point checkInLine(Point start, int direction) throws NoSuchPointException {
 		int dx=0; //change in x
@@ -130,23 +136,23 @@ public class MainScreen extends JFrame {
 		//determine if you can go
 		try {
 			if (board[start.x+dx][start.y+dy].getState() != -player) { //if the adjacent piece 
-				throw new NoSuchPointException();
+				throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Adjacent Piece isn't opposite of player's color");
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new NoSuchPointException();
+			throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Adjacent Piece off grid");
 		}
 		//go all the way in the direction of dx,dy
 		Point current = start.clone();
 		try {
-			while (board[current.x+dx][current.y+dy].getState() == -player) {
+			do {
 				current.x += dx;
 				current.y += dy;
-			}
+			} while (board[current.x][current.y].getState() == -player);
 			if (board[current.x][current.y].getState() != Piece.BLANK) //Ends on a piece of same color
-				throw new NoSuchPointException();
+				throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Endpoint "+current+" isn't blank");
 			return current;
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new NoSuchPointException();
+			throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Endpoint "+current+" is off grid");
 		}
 	}
 	/**
@@ -165,19 +171,24 @@ public class MainScreen extends JFrame {
 	 * @return true if the update succeeded, false otherwise
 	 */
 	private static boolean updateBoard(int x, int y, int piece) {
-		try {
-			if (visualBoard[x][y]==null) {
-				visualBoard[x][y] = new PieceLabel(x,y,piece);
-			} else {
-				if (board[x][y].getState() != Piece.BLANK)
-					return false;
-				visualBoard[x][y].setPiece(piece);
-			}
+		if (visualBoard[x][y].getPiece() == Piece.getGhost(piece)) {
+			visualBoard[x][y].setPiece(piece);
 			board[x][y] = new Piece(piece);
 			return true;
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return false;
-		} 
+		}
+		return false;
+	}
+	/**
+	 * Forces the board to add a piece, whether or not it wants to
+	 * @see main.MainScreen.updateBoard(int,int,int)
+	 */
+	private static void forceUpdateBoard(int x, int y, int piece) {
+		if (visualBoard[x][y] == null) {
+			visualBoard[x][y] = new PieceLabel(x,y,piece);
+		} else {
+			visualBoard[x][y].setPiece(piece);
+		}
+		board[x][y] = new Piece(piece);
 	}
 	private static class Point {
 		int x,y;
@@ -191,6 +202,9 @@ public class MainScreen extends JFrame {
 		public Point clone() {
 			return new Point(x,y);
 		}
+		public String toString() {
+			return "("+x+","+y+")"; 
+		}
 	}
 	private static class PieceLabel extends JLabel {
 		private static final long serialVersionUID = 5423659178406010534L;
@@ -203,6 +217,7 @@ public class MainScreen extends JFrame {
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
 					updateBoard(x,y,player);
+					checkForGhosts();
 				}
 			});
 		}

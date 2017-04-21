@@ -5,5 +5,13 @@ package main;
  *
  */
 public class NoSuchPointException extends Exception {
+	public NoSuchPointException(String string) {
+		super(string);
+	}
+
+	public NoSuchPointException() {
+		super();
+	}
+
 	private static final long serialVersionUID = 7064516393467927299L;
 }

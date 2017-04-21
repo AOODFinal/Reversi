@@ -12,7 +12,6 @@ import javax.swing.ImageIcon;
 import main.Piece;
 
 public class ImageGrab {
-	public static final int BLACKGHOST=2,WHITEGHOST=3;
 	private static Icon[] pieces;
 	public ImageGrab() {
 		pieces = new Icon[5];
@@ -20,10 +19,11 @@ public class ImageGrab {
 			pieces[Piece.BLANK+1] = new ImageIcon(ImageIO.read(new File("image/blank.png")));
 			pieces[Piece.WHITE+1] = new ImageIcon(ImageIO.read(new File("image/white.png")));
 			pieces[Piece.BLACK+1] = new ImageIcon(ImageIO.read(new File("image/black.png")));
-			pieces[BLACKGHOST+1] = new ImageIcon(ImageIO.read(new File("image/ghostblack.png")));
-			pieces[WHITEGHOST+1] = new ImageIcon(ImageIO.read(new File("image/ghostwhite.png")));
+			pieces[Piece.BLACKGHOST+1] = new ImageIcon(ImageIO.read(new File("image/ghostblack.png")));
+			pieces[Piece.WHITEGHOST+1] = new ImageIcon(ImageIO.read(new File("image/ghostwhite.png")));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
 		}
 	}

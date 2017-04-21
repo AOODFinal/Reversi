@@ -7,6 +7,7 @@ import util.ImageGrab;
 public class Piece {
 	private int state; //0 - Blank, 1 - White, -1 - Black
 	public static final int BLANK=0,WHITE=1,BLACK=-1;
+	public static final int BLACKGHOST=2,WHITEGHOST=3;
 	public Piece() {
 		state=0;
 	}
@@ -21,5 +22,8 @@ public class Piece {
 	}
 	public Icon getIcon() {
 		return ImageGrab.getIconFromPiece(state);
+	}
+	public static int getGhost(int player) {
+		return (player+1)/2+BLACKGHOST;
 	}
 }
