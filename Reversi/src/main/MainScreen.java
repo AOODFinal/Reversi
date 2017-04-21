@@ -65,9 +65,12 @@ public class MainScreen extends JFrame {
 	 * Check to place ghosts (where the player is allowed to place tiles)
 	 */
 	private static ArrayList<Point> ghosts;
+	private static ArrayList<Point> compGhosts;
 	private static void checkForGhosts() {
 		if (ghosts==null)
 			ghosts = new ArrayList<>();
+		if (compGhosts==null)
+			compGhosts = new ArrayList<>();
 		//TODO Check for and place ghosty points in ghosts
 		ArrayList<Point> playerPieces = new ArrayList<>();
 		for (int x=0;x<board[0].length;x++) {
