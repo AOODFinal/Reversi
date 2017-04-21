@@ -193,7 +193,32 @@ public class MainScreen extends JFrame {
 		}
 	}
 	public static void switchBetween(int x, int y, int switcher) {
-		
+		ArrayList<Point> toChange = new ArrayList<>();
+		int cx,cy; //current x,y
+		for (int dx=-1;dx<=1;dx++) {
+			for (int dy=-1;dy<=1;dy++) {
+				if (dx == dy && dx == 0)
+					continue;
+				cx=x+dx;
+				cy=y+dy;
+				try {
+					while (board[cx][cy].getState() == -switcher) {
+						toChange.add(new Point(cx,cy));
+						cx+=dx;
+						cy+=dy;
+					}
+					//hit end of row
+					if (board[cx][cy].getState() == switcher) { //If the row ended with the switcher's color
+						for (Point p : toChange) {
+							forceUpdateBoard(p.x,p.y,switcher); //change the pieces to the switcher's color
+						}
+					}
+				} catch (ArrayIndexOutOfBoundsException e) {
+				} finally {
+					toChange.clear();
+				}
+			}
+		}
 	}
 	/**
 	 * Determines if the game is over
@@ -213,7 +238,8 @@ public class MainScreen extends JFrame {
 	private static boolean updateBoard(int x, int y, int piece) {
 		if (visualBoard[x][y].getPiece() == Piece.getGhost(piece)) {
 			visualBoard[x][y].setPiece(piece);
-			board[x][y] = new Piece(piece);
+			if (piece != Piece.BLACKGHOST && piece != Piece.WHITEGHOST)
+				board[x][y] = new Piece(piece);
 			return true;
 		}
 		return false;
