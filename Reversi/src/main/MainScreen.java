@@ -58,7 +58,10 @@ public class MainScreen extends JFrame {
 		pack();
 		setVisible(true);
 		setResizable(false);
-		checkForGhosts();
+		checkForGhosts(player);
+		for (Point ghost : ghosts) {
+			visualBoard[ghost.x][ghost.y].setPiece((player+1)/2 + Piece.BLACKGHOST);
+		}
 	}
 	
 	/**
@@ -66,7 +69,7 @@ public class MainScreen extends JFrame {
 	 */
 	private static ArrayList<Point> ghosts;
 	private static ArrayList<Point> compGhosts;
-	private static void checkForGhosts() {
+	private static void checkForGhosts(int toCheck) {
 		if (ghosts==null)
 			ghosts = new ArrayList<>();
 		if (compGhosts==null)
@@ -75,7 +78,7 @@ public class MainScreen extends JFrame {
 		ArrayList<Point> playerPieces = new ArrayList<>();
 		for (int x=0;x<board[0].length;x++) {
 			for (int y=0;y<board.length;y++) {
-				if (board[x][y].getState() == player) {
+				if (board[x][y].getState() == toCheck) {
 					playerPieces.add(new Point(x,y));
 				}
 			}
@@ -84,14 +87,14 @@ public class MainScreen extends JFrame {
 		for (Point p : playerPieces) {
 			for (int i=1;i<=8;i++) {
 				try {
-					ghosts.add(checkInLine(p,i));
+					if (toCheck==player)
+						ghosts.add(checkInLine(p,i,toCheck));
+					else
+						compGhosts.add(checkInLine(p,i,toCheck));
 				} catch (NoSuchPointException e) {
 					//System.out.println(e.getMessage()); //Uncomment to display invalid points in console
 				}
 			}
-		}
-		for (Point ghost : ghosts) {
-			visualBoard[ghost.x][ghost.y].setPiece((player+1)/2 + Piece.BLACKGHOST);
 		}
 	}
 	/**
@@ -105,7 +108,7 @@ public class MainScreen extends JFrame {
 	 * @return the point the player can play at
 	 * @throws NoSuchPointException if no such point exists
 	 */
-	private static Point checkInLine(Point start, int direction) throws NoSuchPointException {
+	private static Point checkInLine(Point start, int direction, int toCheck) throws NoSuchPointException {
 		int dx=0; //change in x
 		int dy=0; //change in y
 		/*
@@ -138,7 +141,7 @@ public class MainScreen extends JFrame {
 		}
 		//determine if you can go
 		try {
-			if (board[start.x+dx][start.y+dy].getState() != -player) { //if the adjacent piece 
+			if (board[start.x+dx][start.y+dy].getState() != -toCheck) { //if the adjacent piece isn't opposing player's color
 				throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Adjacent Piece isn't opposite of player's color");
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -150,7 +153,7 @@ public class MainScreen extends JFrame {
 			do {
 				current.x += dx;
 				current.y += dy;
-			} while (board[current.x][current.y].getState() == -player);
+			} while (board[current.x][current.y].getState() == -toCheck);
 			if (board[current.x][current.y].getState() != Piece.BLANK) //Ends on a piece of same color
 				throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Endpoint "+current+" isn't blank");
 			return current;
@@ -220,7 +223,7 @@ public class MainScreen extends JFrame {
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
 					updateBoard(x,y,player);
-					checkForGhosts();
+					checkForGhosts(player);
 				}
 			});
 		}
