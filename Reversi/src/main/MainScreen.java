@@ -11,8 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import ai.AI;
-import ai.GeneralAI;
+import ai.*;
 import util.ImageGrab;
 
 public class MainScreen extends JFrame {
@@ -26,7 +25,7 @@ public class MainScreen extends JFrame {
 	}
 	public MainScreen() {
 		super("Reversi/Othello");
-		comp = new GeneralAI();
+		comp = new ShortAI();
 		Object[] colors = {"Black" , "White"};
 		int answer = JOptionPane.showOptionDialog(this, "Would you like to play as black or white?",
 				"Select Player",
@@ -256,6 +255,18 @@ public class MainScreen extends JFrame {
 		}
 		board[x][y] = new Piece(piece);
 	}
+	/**
+	 * Changes the ArrayList of points into a grid
+	 * @param compGhosts and array of points
+	 * @return a grid where true is where the points were, false elsewhere
+	 */
+	private static boolean[][] translateBoard(ArrayList<Point> compGhosts) {
+		boolean[][] grid = new boolean[8][8];
+		for (Point p : compGhosts.toArray(new Point[0])) {
+			grid[p.x][p.y] = true;
+		}
+		return grid;
+	}
 	private static class Point {
 		int x,y;
 		public Point(int x, int y) {
@@ -282,10 +293,16 @@ public class MainScreen extends JFrame {
 			this.y=y;
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
-					updateBoard(x,y,player);
-					checkForGhosts(player);
-					displayGhosts(player);
-					switchBetween(x,y,player);
+					if (updateBoard(x,y,player)) {
+						checkForGhosts(player);
+						displayGhosts(player);
+						switchBetween(x,y,player);
+						//Computer Turn
+						checkForGhosts(-player);
+						int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
+						forceUpdateBoard(compTurn[0],compTurn[1],-player);
+						switchBetween(compTurn[0],compTurn[1],-player);
+					}
 				}
 			});
 		}
