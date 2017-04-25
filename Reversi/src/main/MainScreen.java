@@ -224,7 +224,18 @@ public class MainScreen extends JFrame {
 	 * @return true if the game is over, false otherwise
 	 */
 	private static boolean gameOver() {
-		// TODO
+		boolean full=true;
+		for (Piece[] row : board) {
+			for (Piece space : row) {
+				if(space.getState()==0){
+					full=false;
+				}
+			}
+		}
+		if(full==true){ //still need to add if unable to move
+			return true;
+		}
+		//board needs to be full or unable to move/pass their turn
 		return false;
 	}
 	/**
