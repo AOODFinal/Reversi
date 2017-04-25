@@ -300,6 +300,8 @@ public class MainScreen extends JFrame {
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
 					if (updateBoard(x,y,player)) {
+						checkForGhosts(player);
+						displayGhosts(player);
 						switchBetween(x,y,player);
 						//Computer Turn
 						checkForGhosts(-player);
