@@ -26,4 +26,14 @@ public class Piece {
 	public static int getGhost(int player) {
 		return (player+1)/2+BLACKGHOST;
 	}
+	public String toString() {
+		switch (state) {
+		case BLANK:return "O";
+		case WHITE:return "W";
+		case BLACK:return "B";
+		case BLACKGHOST:return "b";
+		case WHITEGHOST:return "w";
+		}
+		return "?";
+	}
 }

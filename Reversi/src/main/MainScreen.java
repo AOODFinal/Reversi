@@ -67,6 +67,13 @@ public class MainScreen extends JFrame {
 					player = -player;
 					checkForGhosts(player);
 					displayGhosts(player);
+				} else if (e.getKeyCode() == KeyEvent.VK_Q) {
+					for (Piece[] row : board) {
+						for (Piece i : row) {
+							System.out.print(i + " ");
+						}
+						System.out.println();
+					}
 				}
 			}
 		});
@@ -111,7 +118,7 @@ public class MainScreen extends JFrame {
 					else
 						compGhosts.add(checkInLine(p,i,toCheck));
 				} catch (NoSuchPointException e) {
-					//System.out.println(e.getMessage()); //Uncomment to display invalid points in console
+					//System.err.println(e.getMessage()); //Uncomment to display invalid points in console
 				}
 			}
 		}
@@ -145,26 +152,26 @@ public class MainScreen extends JFrame {
 		case 6:
 		case 7:
 		case 8:dx=-1;break;
-			default:
+			default:throw new NoSuchPointException("Invalid Direction");
 		}
 		switch (direction) {
 		case 8:
 		case 1:
-		case 2:dy=1;break;
+		case 2:dy=-1;break;
 		case 3:
 		case 7:dy=0;break;
 		case 4:
 		case 5:
-		case 6:dy=-1;break;
-			default:
+		case 6:dy=1;break;
+			default:throw new NoSuchPointException("Invalid Direction");
 		}
 		//determine if you can go
 		try {
 			if (board[start.x+dx][start.y+dy].getState() != -toCheck) { //if the adjacent piece isn't opposing player's color
-				throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Adjacent Piece isn't opposite of player's color");
+				throw new NoSuchPointException("(Direction "+direction + ", Point "+start+", Going to " + new Point(start.x+dx,start.y+dy) + ") Adjacent Piece isn't opposite of player's color, it is " + board[start.x+dx][start.y+dy].getState());
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Adjacent Piece off grid");
+			throw new NoSuchPointException("(Direction "+direction + ", Point "+start+", Going to " + new Point(start.x+dx,start.y+dy) + ") Adjacent Piece off grid");
 		}
 		//go all the way in the direction of dx,dy
 		Point current = start.clone();
@@ -181,6 +188,13 @@ public class MainScreen extends JFrame {
 		}
 	}
 	public static void displayGhosts(int toShow) {
+		for (int x=0;x<visualBoard[0].length;x++) {
+			for (int y=0;y<visualBoard.length;y++) {
+				if (visualBoard[x][y].getPiece() == (toShow+1)/2 + Piece.BLACKGHOST) {
+					visualBoard[x][y].setPiece(Piece.BLANK);
+				}
+			}
+		}
 		if (toShow == player) {
 			for (Point ghost : ghosts) {
 				visualBoard[ghost.x][ghost.y].setPiece((toShow+1)/2 + Piece.BLACKGHOST);
@@ -245,7 +259,7 @@ public class MainScreen extends JFrame {
 	 * @return true if the update succeeded, false otherwise
 	 */
 	private static boolean updateBoard(int x, int y, int piece) {
-		if (visualBoard[x][y].getPiece() == Piece.getGhost(piece)) {
+		if (visualBoard[x][y].getPiece() == Piece.getGhost(piece) || piece == Piece.BLACKGHOST || piece == Piece.WHITEGHOST || piece == Piece.BLANK) {
 			visualBoard[x][y].setPiece(piece);
 			if (piece != Piece.BLACKGHOST && piece != Piece.WHITEGHOST)
 				board[x][y] = new Piece(piece);
@@ -312,6 +326,8 @@ public class MainScreen extends JFrame {
 						int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
 						forceUpdateBoard(compTurn[0],compTurn[1],-player);
 						switchBetween(compTurn[0],compTurn[1],-player);
+						checkForGhosts(player);
+						displayGhosts(player);
 					}
 				}
 			});
