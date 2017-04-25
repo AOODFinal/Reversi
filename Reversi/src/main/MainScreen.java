@@ -232,10 +232,9 @@ public class MainScreen extends JFrame {
 				}
 			}
 		}
-		if(full==true){ //still need to add if unable to move
+		if(full==true||(ghosts.isEmpty()&&compGhosts.isEmpty())){
 			return true;
 		}
-		//board needs to be full or unable to move/pass their turn
 		return false;
 	}
 	/**
