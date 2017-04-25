@@ -191,6 +191,12 @@ public class MainScreen extends JFrame {
 			}
 		}
 	}
+	/**
+	 * Switch pieces to 
+	 * @param x the piece to check from's x-coordinate
+	 * @param y """"'s y-coordinate
+	 * @param switcher the player/comp the pieces will switch to
+	 */
 	public static void switchBetween(int x, int y, int switcher) {
 		ArrayList<Point> toChange = new ArrayList<>();
 		int cx,cy; //current x,y
@@ -294,14 +300,15 @@ public class MainScreen extends JFrame {
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
 					if (updateBoard(x,y,player)) {
-						checkForGhosts(player);
-						displayGhosts(player);
 						switchBetween(x,y,player);
 						//Computer Turn
 						checkForGhosts(-player);
 						int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
 						forceUpdateBoard(compTurn[0],compTurn[1],-player);
 						switchBetween(compTurn[0],compTurn[1],-player);
+						//Recheck player's ghosts after computer move
+						checkForGhosts(player);
+						displayGhosts(player);
 					}
 				}
 			});
