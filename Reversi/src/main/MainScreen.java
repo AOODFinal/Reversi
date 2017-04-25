@@ -323,11 +323,36 @@ public class MainScreen extends JFrame {
 						switchBetween(x,y,player);
 						//Computer Turn
 						checkForGhosts(-player);
-						int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
-						forceUpdateBoard(compTurn[0],compTurn[1],-player);
-						switchBetween(compTurn[0],compTurn[1],-player);
-						checkForGhosts(player);
-						displayGhosts(player);
+						if (!compGhosts.isEmpty()) {
+							int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
+							forceUpdateBoard(compTurn[0],compTurn[1],-player);
+							switchBetween(compTurn[0],compTurn[1],-player);
+							checkForGhosts(player);
+							displayGhosts(player);
+							while (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
+								int[] compTurn2 = comp.getBestMove(board, translateBoard(compGhosts));
+								if (compTurn2==null) break;
+								forceUpdateBoard(compTurn2[0],compTurn2[1],-player);
+								switchBetween(compTurn2[0],compTurn2[1],-player);
+								checkForGhosts(player);
+								displayGhosts(player);
+							}
+						}
+						if (gameOver()) {
+							int playerTiles=0,compTiles=0;
+							for (Piece[] row : board) {
+								for (Piece i : row) {
+									if (i.getState()==player) {
+										playerTiles++;
+									} else if (i.getState()==-player) {
+										compTiles++;
+									}
+								}
+							}
+							String winner = playerTiles>=compTiles?"Player":"Computer";
+							JOptionPane.showMessageDialog(null, "Game over. "+winner+" won!");
+							System.exit(0);
+						}
 					}
 				}
 			});
