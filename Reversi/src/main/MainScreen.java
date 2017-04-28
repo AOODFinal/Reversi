@@ -92,7 +92,7 @@ public class MainScreen extends JFrame {
 		//remove current ghost points
 		if (toCheck == player) {
 			for (Point ghost : ghosts) {
-				if (visualBoard[ghost.x][ghost.y].getPiece() != player)
+				if (visualBoard[ghost.x][ghost.y].getPiece() == Piece.getGhost(player))
 					visualBoard[ghost.x][ghost.y].setPiece(Piece.BLANK);
 			}
 		}
@@ -190,18 +190,18 @@ public class MainScreen extends JFrame {
 	public static void displayGhosts(int toShow) {
 		for (int x=0;x<visualBoard[0].length;x++) {
 			for (int y=0;y<visualBoard.length;y++) {
-				if (visualBoard[x][y].getPiece() == (toShow+1)/2 + Piece.BLACKGHOST) {
+				if (visualBoard[x][y].getPiece() == Piece.getGhost(toShow)) {
 					visualBoard[x][y].setPiece(Piece.BLANK);
 				}
 			}
 		}
 		if (toShow == player) {
 			for (Point ghost : ghosts) {
-				visualBoard[ghost.x][ghost.y].setPiece((toShow+1)/2 + Piece.BLACKGHOST);
+				visualBoard[ghost.x][ghost.y].setPiece(Piece.getGhost(toShow));
 			}
 		} else {
 			for (Point ghost : compGhosts) {
-				visualBoard[ghost.x][ghost.y].setPiece((toShow+1)/2 + Piece.BLACKGHOST);
+				visualBoard[ghost.x][ghost.y].setPiece(Piece.getGhost(toShow));
 			}
 		}
 	}
@@ -261,7 +261,7 @@ public class MainScreen extends JFrame {
 	private static boolean updateBoard(int x, int y, int piece) {
 		if (visualBoard[x][y].getPiece() == Piece.getGhost(piece) || piece == Piece.BLACKGHOST || piece == Piece.WHITEGHOST || piece == Piece.BLANK) {
 			visualBoard[x][y].setPiece(piece);
-			if (piece != Piece.BLACKGHOST && piece != Piece.WHITEGHOST)
+			if (piece != Piece.BLACKGHOST && piece != Piece.WHITEGHOST && piece != Piece.BLANK)
 				board[x][y] = new Piece(piece);
 			return true;
 		}
@@ -278,6 +278,23 @@ public class MainScreen extends JFrame {
 			visualBoard[x][y].setPiece(piece);
 		}
 		board[x][y] = new Piece(piece);
+	}
+	/**
+	 * Checks to make sure all pieces on board (Only Piece.WHITE, .BLACK, .BLANK)
+	 * @return true if board corresponds to VisualBoard, false if discrepancy
+	 */
+	private static boolean checkVisualBoard() {
+		boolean correct = true;
+		for (int x=0;x<board[0].length;x++) {
+			for (int y=0;y<board.length;y++) {
+				if (board[x][y].getState() != visualBoard[x][y].getPiece() && (board[x][y].getState() != Piece.BLANK && visualBoard[x][y].getPiece() >= Piece.BLACKGHOST)) {
+					System.out.println("Discrepancy at "+new Point(x,y)+" between vb:"+visualBoard[x][y].getPiece()+" and b:"+board[x][y].getState());
+					correct = false;
+					forceUpdateBoard(x,y,board[x][y].getState());
+				}
+			}
+		}
+		return correct;
 	}
 	/**
 	 * Changes the ArrayList of points into a grid
@@ -297,9 +314,6 @@ public class MainScreen extends JFrame {
 			this.x=x;
 			this.y=y;
 		}
-		public Point() {
-			x=0;y=0;
-		}
 		public Point clone() {
 			return new Point(x,y);
 		}
@@ -309,12 +323,10 @@ public class MainScreen extends JFrame {
 	}
 	private static class PieceLabel extends JLabel {
 		private static final long serialVersionUID = 5423659178406010534L;
-		private int piece,x,y;
+		private int piece;
 		public PieceLabel(int x, int y, int piece) {
 			super(ImageGrab.getIconFromPiece(piece));
 			this.piece=piece;
-			this.x=x;
-			this.y=y;
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
 					if (updateBoard(x,y,player)) {
@@ -323,10 +335,11 @@ public class MainScreen extends JFrame {
 						switchBetween(x,y,player);
 						//Computer Turn
 						checkForGhosts(-player);
-						if (!compGhosts.isEmpty()) {
+						if (!compGhosts.isEmpty()) { //If computer can play
 							int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
 							forceUpdateBoard(compTurn[0],compTurn[1],-player);
 							switchBetween(compTurn[0],compTurn[1],-player);
+							checkForGhosts(-player);
 							checkForGhosts(player);
 							displayGhosts(player);
 							while (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
@@ -334,9 +347,11 @@ public class MainScreen extends JFrame {
 								if (compTurn2==null) break;
 								forceUpdateBoard(compTurn2[0],compTurn2[1],-player);
 								switchBetween(compTurn2[0],compTurn2[1],-player);
+								checkForGhosts(-player);
 								checkForGhosts(player);
 								displayGhosts(player);
 							}
+							checkVisualBoard();
 						}
 						if (gameOver()) {
 							int playerTiles=0,compTiles=0;
