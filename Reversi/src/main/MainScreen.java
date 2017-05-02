@@ -1,6 +1,8 @@
 package main;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -10,8 +12,10 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 
-import ai.*;
+import ai.AI;
+import ai.ShortAI;
 import util.ImageGrab;
 
 public class MainScreen extends JFrame {
@@ -327,47 +331,63 @@ public class MainScreen extends JFrame {
 		public PieceLabel(int x, int y, int piece) {
 			super(ImageGrab.getIconFromPiece(piece));
 			this.piece=piece;
+			ActionListener compRepeat = new ActionListener() { //Computer repeating turn because player can't play
+				public void actionPerformed(ActionEvent e) {
+					while (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
+						int[] compTurn2 = comp.getBestMove(board, translateBoard(compGhosts));
+						if (compTurn2==null) return;
+						forceUpdateBoard(compTurn2[0],compTurn2[1],-player);
+						switchBetween(compTurn2[0],compTurn2[1],-player);
+						checkForGhosts(-player);
+						checkForGhosts(player);
+						displayGhosts(player);
+					}
+					//Should be done at the end, Timer.start() doesn't pause execution
+					checkVisualBoard();
+					if (gameOver()) {
+						int playerTiles=0,compTiles=0;
+						for (Piece[] row : board) {
+							for (Piece i : row) {
+								if (i.getState()==player) {
+									playerTiles++;
+								} else if (i.getState()==-player) {
+									compTiles++;
+								}
+							}
+						}
+						String winner = playerTiles>=compTiles?"Player":"Computer";
+						JOptionPane.showMessageDialog(null, "Game over. "+winner+" won!");
+						System.exit(0);
+					}
+				}
+			};
+			ActionListener compTurn = new ActionListener() { //Computer's normal turn
+				public void actionPerformed(ActionEvent e) {
+					//Computer Turn
+					checkForGhosts(-player);
+					if (!compGhosts.isEmpty()) { //If computer can play
+						int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
+						forceUpdateBoard(compTurn[0],compTurn[1],-player);
+						switchBetween(compTurn[0],compTurn[1],-player);
+						checkForGhosts(-player);
+						checkForGhosts(player);
+						displayGhosts(player);
+						Timer repeatCompTurn = new Timer(100,compRepeat);
+						if (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
+							repeatCompTurn.start();
+						}
+					}
+				}
+			};
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
 					if (updateBoard(x,y,player)) {
 						checkForGhosts(player);
 						displayGhosts(player);
 						switchBetween(x,y,player);
-						//Computer Turn
-						checkForGhosts(-player);
-						if (!compGhosts.isEmpty()) { //If computer can play
-							int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
-							forceUpdateBoard(compTurn[0],compTurn[1],-player);
-							switchBetween(compTurn[0],compTurn[1],-player);
-							checkForGhosts(-player);
-							checkForGhosts(player);
-							displayGhosts(player);
-							while (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
-								int[] compTurn2 = comp.getBestMove(board, translateBoard(compGhosts));
-								if (compTurn2==null) break;
-								forceUpdateBoard(compTurn2[0],compTurn2[1],-player);
-								switchBetween(compTurn2[0],compTurn2[1],-player);
-								checkForGhosts(-player);
-								checkForGhosts(player);
-								displayGhosts(player);
-							}
-							checkVisualBoard();
-						}
-						if (gameOver()) {
-							int playerTiles=0,compTiles=0;
-							for (Piece[] row : board) {
-								for (Piece i : row) {
-									if (i.getState()==player) {
-										playerTiles++;
-									} else if (i.getState()==-player) {
-										compTiles++;
-									}
-								}
-							}
-							String winner = playerTiles>=compTiles?"Player":"Computer";
-							JOptionPane.showMessageDialog(null, "Game over. "+winner+" won!");
-							System.exit(0);
-						}
+						Timer comp = new Timer(200,compTurn);
+						comp.setRepeats(false);
+						comp.start();
 					}
 				}
 			});
