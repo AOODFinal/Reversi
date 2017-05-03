@@ -317,7 +317,7 @@ public class MainScreen extends JFrame {
 	/**
 	 * Forces the board to add a piece, whether or not it wants to
 	 * @return void because this method always updates the point
-	 * @see main.MainScreen.updateBoard(int,int,int)
+	 * @see #updateBoard(int x, int y, int piece)
 	 */
 	private static void forceUpdateBoard(int x, int y, int piece) {
 		if (visualBoard[x][y] == null) {
@@ -356,6 +356,10 @@ public class MainScreen extends JFrame {
 		}
 		return grid;
 	}
+	/**
+	 * A representation of an x,y-coordinate
+	 *
+	 */
 	private static class Point {
 		int x,y;
 		public Point(int x, int y) {
@@ -380,7 +384,7 @@ public class MainScreen extends JFrame {
 					while (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
 						int[] compTurn2 = comp.getBestMove(board, translateBoard(compGhosts));
 						if (compTurn2==null) {
-							System.out.println("ERROR");
+							System.err.println("ERROR. The computer can play but chose no move");
 							break;
 						}
 						forceUpdateBoard(compTurn2[0],compTurn2[1],-player);
@@ -393,7 +397,6 @@ public class MainScreen extends JFrame {
 			};
 			ActionListener compTurn = new ActionListener() { //Computer's normal turn
 				public void actionPerformed(ActionEvent e) {
-					//Computer Turn
 					checkForGhosts(-player);
 					if (!compGhosts.isEmpty()) { //If computer can play
 						int[] compTurn = comp.getBestMove(board, translateBoard(compGhosts));
@@ -411,7 +414,7 @@ public class MainScreen extends JFrame {
 			};
 			addMouseListener(new MouseAdapter() {
 				public void mouseReleased(MouseEvent e) {
-					if (updateBoard(x,y,player)) {
+					if (updateBoard(x,y,player)) { //Register player turn
 						checkForGhosts(player);
 						displayGhosts(player);
 						switchBetween(x,y,player);
