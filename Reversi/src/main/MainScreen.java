@@ -277,14 +277,23 @@ public class MainScreen extends JFrame {
 	 */
 	private static boolean gameOver() {
 		boolean full=true;
+		boolean anyBlack = false;
+		boolean anyWhite = false;
 		for (Piece[] row : board) {
 			for (Piece space : row) {
-				if(space.getState()==0){
+				if (space.getState() == Piece.BLANK){
 					full=false;
+				} else if (space.getState() == Piece.BLACK) {
+					anyBlack = true;
+				} else if (space.getState() == Piece.WHITE) {
+					anyWhite = true;
 				}
 			}
 		}
-		if(full==true||(ghosts.isEmpty()&&compGhosts.isEmpty())){
+		if (!anyBlack || !anyWhite) { //One player has wiped the other off of the board
+			return true;
+		}
+		if(full==true||(ghosts.isEmpty()&&compGhosts.isEmpty())){ //Board full or noone can play
 			return true;
 		}
 		return false;
