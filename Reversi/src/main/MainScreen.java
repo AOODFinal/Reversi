@@ -25,7 +25,36 @@ public class MainScreen extends JFrame {
 	private static int player;
 	private static AI comp;
 	public static void main(String[] args) {
+		Thread checkEnd = new Thread() { //Thread to check if the game is over, and, if so, who won.
+			public void run() {
+				while (true) {
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					checkVisualBoard();
+					if (gameOver()) {
+						int playerTiles=0,compTiles=0;
+						for (Piece[] row : board) {
+							for (Piece i : row) {
+								if (i.getState()==player) {
+									playerTiles++;
+								} else if (i.getState()==-player) {
+									compTiles++;
+								}
+							}
+						}
+						String winner = playerTiles>=compTiles?"Player":"Computer";
+						JOptionPane.showMessageDialog(null, "Game over. "+winner+" won!");
+						System.exit(0);
+					}
+				}
+			}
+		};
 		new MainScreen();
+		checkEnd.setDaemon(true);
+		checkEnd.start();
 	}
 	public MainScreen() {
 		super("Reversi/Othello");
@@ -186,6 +215,10 @@ public class MainScreen extends JFrame {
 			throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Endpoint "+current+" is off grid");
 		}
 	}
+	/**
+	 * Display the ghosts specified in toShow
+	 * @param toShow the player's whose ghosts to show
+	 */
 	public static void displayGhosts(int toShow) {
 		for (int x=0;x<visualBoard[0].length;x++) {
 			for (int y=0;y<visualBoard.length;y++) {
@@ -356,24 +389,6 @@ public class MainScreen extends JFrame {
 						Timer repeatCompTurn = new Timer(100,compRepeat);
 						if (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
 							repeatCompTurn.start();
-						}
-						while (ghosts.isEmpty() && !compGhosts.isEmpty()) {System.out.println("PAUSED TO WAIT UNTIL SECOND COMPTURN");}
-						//Should be done at the end, Timer.start() doesn't pause execution
-						checkVisualBoard();
-						if (gameOver()) {
-							int playerTiles=0,compTiles=0;
-							for (Piece[] row : board) {
-								for (Piece i : row) {
-									if (i.getState()==player) {
-										playerTiles++;
-									} else if (i.getState()==-player) {
-										compTiles++;
-									}
-								}
-							}
-							String winner = playerTiles>=compTiles?"Player":"Computer";
-							JOptionPane.showMessageDialog(null, "Game over. "+winner+" won!");
-							System.exit(0);
 						}
 					}
 				}
