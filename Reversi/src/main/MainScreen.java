@@ -237,6 +237,12 @@ public class MainScreen extends JFrame {
 			}
 		}
 	}
+	/**
+	 * Switch all valid points from (x,y) to the switcher's color
+	 * @param x the x-coordinate of the initial point
+	 * @param y the y-coordinate of the initial point
+	 * @param switcher the color to switch intermediate points to
+	 */
 	public static void switchBetween(int x, int y, int switcher) {
 		ArrayList<Point> toChange = new ArrayList<>();
 		int cx,cy; //current x,y
@@ -301,6 +307,7 @@ public class MainScreen extends JFrame {
 	}
 	/**
 	 * Forces the board to add a piece, whether or not it wants to
+	 * @return void because this method always updates the point
 	 * @see main.MainScreen.updateBoard(int,int,int)
 	 */
 	private static void forceUpdateBoard(int x, int y, int piece) {
@@ -312,7 +319,7 @@ public class MainScreen extends JFrame {
 		board[x][y] = new Piece(piece);
 	}
 	/**
-	 * Checks to make sure all pieces on board (Only Piece.WHITE, .BLACK, .BLANK)
+	 * Checks to make sure all of board's pieces on visualBoard (Only checks Piece.WHITE, .BLACK, .BLANK)
 	 * @return true if board corresponds to VisualBoard, false if discrepancy
 	 */
 	private static boolean checkVisualBoard() {
