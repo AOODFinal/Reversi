@@ -43,11 +43,6 @@ public class MainScreen extends JFrame {
 		new ImageGrab();
 		board = new Piece[8][8];
 		visualBoard = new PieceLabel[8][8];
-		for (Piece[] row : board) {
-			for (Piece space : row) {
-				space = new Piece();
-			}
-		}
 		for (int i=0;i<visualBoard[0].length;i++) {
 			for (int j=0;j<visualBoard.length;j++) {
 				forceUpdateBoard(i,j,Piece.BLANK);
@@ -335,29 +330,15 @@ public class MainScreen extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					while (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
 						int[] compTurn2 = comp.getBestMove(board, translateBoard(compGhosts));
-						if (compTurn2==null) return;
+						if (compTurn2==null) {
+							System.out.println("ERROR");
+							break;
+						}
 						forceUpdateBoard(compTurn2[0],compTurn2[1],-player);
 						switchBetween(compTurn2[0],compTurn2[1],-player);
 						checkForGhosts(-player);
 						checkForGhosts(player);
 						displayGhosts(player);
-					}
-					//Should be done at the end, Timer.start() doesn't pause execution
-					checkVisualBoard();
-					if (gameOver()) {
-						int playerTiles=0,compTiles=0;
-						for (Piece[] row : board) {
-							for (Piece i : row) {
-								if (i.getState()==player) {
-									playerTiles++;
-								} else if (i.getState()==-player) {
-									compTiles++;
-								}
-							}
-						}
-						String winner = playerTiles>=compTiles?"Player":"Computer";
-						JOptionPane.showMessageDialog(null, "Game over. "+winner+" won!");
-						System.exit(0);
 					}
 				}
 			};
@@ -375,6 +356,24 @@ public class MainScreen extends JFrame {
 						Timer repeatCompTurn = new Timer(100,compRepeat);
 						if (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
 							repeatCompTurn.start();
+						}
+						while (ghosts.isEmpty() && !compGhosts.isEmpty()) {System.out.println("PAUSED TO WAIT UNTIL SECOND COMPTURN");}
+						//Should be done at the end, Timer.start() doesn't pause execution
+						checkVisualBoard();
+						if (gameOver()) {
+							int playerTiles=0,compTiles=0;
+							for (Piece[] row : board) {
+								for (Piece i : row) {
+									if (i.getState()==player) {
+										playerTiles++;
+									} else if (i.getState()==-player) {
+										compTiles++;
+									}
+								}
+							}
+							String winner = playerTiles>=compTiles?"Player":"Computer";
+							JOptionPane.showMessageDialog(null, "Game over. "+winner+" won!");
+							System.exit(0);
 						}
 					}
 				}
