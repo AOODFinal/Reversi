@@ -208,7 +208,7 @@ public class MainScreen extends JFrame {
 				current.x += dx;
 				current.y += dy;
 			} while (board[current.x][current.y].getState() == -toCheck);
-			if (board[current.x][current.y].getState() != Piece.BLANK) //Ends on a piece of same color
+			if (board[current.x][current.y].getState() != Piece.BLANK) //Ends on a non-blank piece
 				throw new NoSuchPointException("(Direction "+direction + ", Point "+start+") Endpoint "+current+" isn't blank");
 			return current;
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -406,6 +406,7 @@ public class MainScreen extends JFrame {
 						checkForGhosts(player);
 						displayGhosts(player);
 						Timer repeatCompTurn = new Timer(100,compRepeat);
+						repeatCompTurn.setRepeats(false);
 						if (ghosts.isEmpty() && !compGhosts.isEmpty()) { //If player cannot play but computer can, let it play
 							repeatCompTurn.start();
 						}
