@@ -13,11 +13,11 @@ public class ImageGrab {
 	public ImageGrab() {
 		pieces = new Icon[5];
 		try {
-			pieces[Piece.BLANK+1] = new ImageIcon(ImageIO.read(new File("image/blank.png")));
-			pieces[Piece.WHITE+1] = new ImageIcon(ImageIO.read(new File("image/white.png")));
-			pieces[Piece.BLACK+1] = new ImageIcon(ImageIO.read(new File("image/black.png")));
-			pieces[Piece.BLACKGHOST+1] = new ImageIcon(ImageIO.read(new File("image/ghostblack.png")));
-			pieces[Piece.WHITEGHOST+1] = new ImageIcon(ImageIO.read(new File("image/ghostwhite.png")));
+			pieces[Piece.BLANK+1] = new ImageIcon(ImageIO.read(new File("/blank.png")));
+			pieces[Piece.WHITE+1] = new ImageIcon(ImageIO.read(new File("/white.png")));
+			pieces[Piece.BLACK+1] = new ImageIcon(ImageIO.read(new File("/black.png")));
+			pieces[Piece.BLACKGHOST+1] = new ImageIcon(ImageIO.read(new File("/ghostblack.png")));
+			pieces[Piece.WHITEGHOST+1] = new ImageIcon(ImageIO.read(new File("/ghostwhite.png")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ArrayIndexOutOfBoundsException e) {
