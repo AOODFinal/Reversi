@@ -1,8 +1,5 @@
 package util;
 
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -13,13 +10,11 @@ public class ImageGrab {
 	public ImageGrab() {
 		pieces = new Icon[5];
 		try {
-			pieces[Piece.BLANK+1] = new ImageIcon(ImageIO.read(new File("image/blank.png")));
-			pieces[Piece.WHITE+1] = new ImageIcon(ImageIO.read(new File("image/white.png")));
-			pieces[Piece.BLACK+1] = new ImageIcon(ImageIO.read(new File("image/black.png")));
-			pieces[Piece.BLACKGHOST+1] = new ImageIcon(ImageIO.read(new File("image/ghostblack.png")));
-			pieces[Piece.WHITEGHOST+1] = new ImageIcon(ImageIO.read(new File("image/ghostwhite.png")));
-		} catch (IOException e) {
-			e.printStackTrace();
+			pieces[Piece.BLANK+1] = new ImageIcon(ImageGrab.class.getResource("image/blank.png"));
+			pieces[Piece.WHITE+1] = new ImageIcon(ImageGrab.class.getResource("image/white.png"));
+			pieces[Piece.BLACK+1] = new ImageIcon(ImageGrab.class.getResource("image/black.png"));
+			pieces[Piece.BLACKGHOST+1] = new ImageIcon(ImageGrab.class.getResource("image/ghostblack.png"));
+			pieces[Piece.WHITEGHOST+1] = new ImageIcon(ImageGrab.class.getResource("image/ghostwhite.png"));
 		} catch (ArrayIndexOutOfBoundsException e) {
 			e.printStackTrace();
 		}
